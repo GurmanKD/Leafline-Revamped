@@ -123,3 +123,65 @@ def get_plantation(
         coordinates=coords,
         created_at=plantation.created_at,
     )
+
+@router.get("/{plantation_id}/dashboard", response_model=schemas.PlantationDashboardOut)
+def plantation_dashboard(
+    plantation_id: int,
+    db: Session = Depends(get_db_session),
+    current_user: models.User = Depends(get_current_user_from_header),
+):
+    """
+    Aggregated view for a plantation:
+    - Last ML analysis
+    - Credit balance
+    - Active credit listings
+    """
+    # Fetch plantation
+    stmt = select(models.Plantation).where(models.Plantation.id == plantation_id)
+    plantation = db.execute(stmt).scalar_one_or_none()
+
+    if plantation is None:
+        raise HTTPException(status_code=404, detail="Plantation not found.")
+
+    if plantation.owner_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Unauthorized access.")
+
+    # Latest analysis (if any)
+    latest_analysis = None
+    if plantation.analyses:
+        latest = sorted(plantation.analyses, key=lambda a: a.analyzed_at)[-1]
+        latest_analysis = schemas.PlantationAnalysisOut.model_validate(latest)
+
+    # Credit balance
+    balance = plantation.credit_balance
+    if balance is None:
+        raise HTTPException(status_code=500, detail="Credit balance missing.")
+
+    credit_balance = schemas.GreenCreditBalanceOut.model_validate(balance)
+
+    # Active listings
+    stmt_listings = select(models.CreditListing).where(
+        models.CreditListing.plantation_id == plantation.id,
+        models.CreditListing.status.in_(
+            [models.ListingStatus.ACTIVE, models.ListingStatus.PARTIALLY_FILLED]
+        ),
+    )
+    listings = db.execute(stmt_listings).scalars().all()
+
+    listings_out = [schemas.CreditListingOut.model_validate(l) for l in listings]
+
+    plantation_out = schemas.PlantationOut(
+        id=plantation.id,
+        owner_id=plantation.owner_id,
+        name=plantation.name,
+        coordinates=[schemas.Coordinate(**c) for c in plantation.coordinates_json],
+        created_at=plantation.created_at,
+    )
+
+    return schemas.PlantationDashboardOut(
+        plantation=plantation_out,
+        latest_analysis=latest_analysis,
+        credit_balance=credit_balance,
+        active_listings=listings_out,
+    )
+

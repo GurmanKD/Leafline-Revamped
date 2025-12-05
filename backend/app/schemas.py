@@ -131,3 +131,11 @@ class TradeOut(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+# ==== DASHBOARD ====
+
+class PlantationDashboardOut(BaseModel):
+    plantation: PlantationOut
+    latest_analysis: Optional[PlantationAnalysisOut]
+    credit_balance: GreenCreditBalanceOut
+    active_listings: list[CreditListingOut]
