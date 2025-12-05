@@ -2,9 +2,13 @@ from fastapi import FastAPI
 
 from .config import settings
 from .schemas import HealthResponse
+from .database import Base, engine
 
 
 def create_app() -> FastAPI:
+    # Create all tables (dev only – for production we'd use Alembic migrations)
+    Base.metadata.create_all(bind=engine)
+
     app = FastAPI(
         title=settings.PROJECT_NAME,
         version="0.1.0",
@@ -18,8 +22,8 @@ def create_app() -> FastAPI:
         """
         return HealthResponse(status="ok", project=settings.PROJECT_NAME)
 
-    # In future commits we’ll include routers here:
-    # from .routers import plantations, marketplace, auth, analysis
+    # Future:
+    # from .routers import plantations, auth, marketplace, analysis
     # app.include_router(plantations.router, prefix=settings.API_V1_PREFIX)
     # ...
 
