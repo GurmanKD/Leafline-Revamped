@@ -139,3 +139,13 @@ class PlantationDashboardOut(BaseModel):
     latest_analysis: Optional[PlantationAnalysisOut]
     credit_balance: GreenCreditBalanceOut
     active_listings: list[CreditListingOut]
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
+

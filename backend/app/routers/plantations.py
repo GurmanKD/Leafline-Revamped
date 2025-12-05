@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 
 from .. import models, schemas
-from ..deps import get_db_session, get_current_user_from_header
+from ..deps import get_db_session, get_current_user
 
 router = APIRouter(
     prefix="/plantations",
@@ -21,7 +21,7 @@ router = APIRouter(
 def create_plantation(
     plantation_in: schemas.PlantationCreate,
     db: Session = Depends(get_db_session),
-    current_user: models.User = Depends(get_current_user_from_header),
+    current_user: models.User = Depends(get_current_user),
 ) -> schemas.PlantationOut:
     """
     Create a new plantation for the current user.
@@ -66,7 +66,7 @@ def create_plantation(
 @router.get("", response_model=List[schemas.PlantationOut])
 def list_my_plantations(
     db: Session = Depends(get_db_session),
-    current_user: models.User = Depends(get_current_user_from_header),
+    current_user: models.User = Depends(get_current_user),
 ) -> List[schemas.PlantationOut]:
     """
     List all plantations belonging to the current user.
@@ -94,7 +94,7 @@ def list_my_plantations(
 def get_plantation(
     plantation_id: int,
     db: Session = Depends(get_db_session),
-    current_user: models.User = Depends(get_current_user_from_header),
+    current_user: models.User = Depends(get_current_user),
 ) -> schemas.PlantationOut:
     """
     Get a single plantation by ID, ensuring it belongs to the current user.
@@ -128,7 +128,7 @@ def get_plantation(
 def plantation_dashboard(
     plantation_id: int,
     db: Session = Depends(get_db_session),
-    current_user: models.User = Depends(get_current_user_from_header),
+    current_user: models.User = Depends(get_current_user),
 ):
     """
     Aggregated view for a plantation:

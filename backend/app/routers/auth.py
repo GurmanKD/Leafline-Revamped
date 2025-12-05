@@ -4,7 +4,7 @@ from sqlalchemy import select
 
 from .. import models, schemas
 from ..deps import get_db_session
-from ..security import hash_password
+from ..security import hash_password, verify_password, create_access_token
 
 router = APIRouter(
     prefix="/auth",
@@ -47,3 +47,27 @@ def signup(user_in: schemas.UserCreate, db: Session = Depends(get_db_session)) -
 
     # Pydantic will convert SQLAlchemy object -> UserOut via from_attributes
     return schemas.UserOut.model_validate(new_user)
+
+
+@router.post("/login", response_model=schemas.Token)
+def login(
+    credentials: schemas.UserLogin,
+    db: Session = Depends(get_db_session),
+) -> schemas.Token:
+    """
+    Log in a user by email and password.
+
+    Returns a JWT access token if credentials are valid.
+    """
+    stmt = select(models.User).where(models.User.email == credentials.email)
+    user = db.execute(stmt).scalar_one_or_none()
+
+    if user is None or not verify_password(credentials.password, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password.",
+        )
+
+    access_token = create_access_token({"sub": str(user.id)})
+
+    return schemas.Token(access_token=access_token, token_type="bearer")

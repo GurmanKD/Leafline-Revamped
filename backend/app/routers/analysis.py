@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 
 from .. import models, schemas
-from ..deps import get_db_session, get_current_user_from_header
+from ..deps import get_db_session, get_current_user
 from ..ml_engine import (
     run_fake_tree_model,
     run_fake_ndvi_model,
@@ -22,7 +22,7 @@ def analyze_plantation(
     plantation_id: int,
     payload: schemas.PlantationAnalyzeRequest,
     db: Session = Depends(get_db_session),
-    current_user: models.User = Depends(get_current_user_from_header),
+    current_user: models.User = Depends(get_current_user),
 ):
     """
     Run analysis pipeline for a plantation.
