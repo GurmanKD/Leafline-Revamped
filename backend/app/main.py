@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from .config import settings
 from .schemas import HealthResponse
 from .database import Base, engine
+from .routers import auth
 
 
 def create_app() -> FastAPI:
@@ -22,10 +23,8 @@ def create_app() -> FastAPI:
         """
         return HealthResponse(status="ok", project=settings.PROJECT_NAME)
 
-    # Future:
-    # from .routers import plantations, auth, marketplace, analysis
-    # app.include_router(plantations.router, prefix=settings.API_V1_PREFIX)
-    # ...
+    # Include routers
+    app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
 
     return app
 

@@ -11,3 +11,7 @@ python-multipart==0.0.9
 
 # For future ML stubs / NDVI, etc.
 numpy==2.1.3
+
+# Password hashing
+bcrypt==4.2.0
+
