@@ -94,3 +94,40 @@ class PlantationAnalyzeRequest(BaseModel):
     - run_aqi
     """
     force_recompute: bool = False
+
+# ==== MARKETPLACE: LISTINGS & TRADES ====
+
+
+class CreditListingCreate(BaseModel):
+    plantation_id: int
+    credits: int = Field(..., gt=0)
+    price_per_credit: float = Field(..., gt=0)
+
+
+class CreditListingOut(BaseModel):
+    id: int
+    plantation_id: int
+    seller_id: int
+    total_credits: int
+    remaining_credits: int
+    price_per_credit: float
+    status: str
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class TradeCreate(BaseModel):
+    listing_id: int
+    credits: int = Field(..., gt=0)
+
+
+class TradeOut(BaseModel):
+    id: int
+    listing_id: int
+    buyer_id: int
+    credits: int
+    total_price: float
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
