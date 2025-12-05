@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "Leafline Revamped"
+    PROJECT_NAME: str = "Leafline Revamped by Gurman"
     API_V1_PREFIX: str = "/api/v1"
 
     # DB – will use SQLite for now, can swap to Postgres later
