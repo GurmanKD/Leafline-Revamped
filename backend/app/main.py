@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from .config import settings
 from .schemas import HealthResponse
 from .database import Base, engine
-from .routers import auth
+from .routers import auth, plantations
 
 
 def create_app() -> FastAPI:
@@ -25,6 +25,7 @@ def create_app() -> FastAPI:
 
     # Include routers
     app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
+    app.include_router(plantations.router, prefix=settings.API_V1_PREFIX)
 
     return app
 
