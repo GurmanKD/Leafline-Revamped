@@ -81,3 +81,16 @@ class GreenCreditBalanceOut(BaseModel):
     locked_credits: int
 
     model_config = ConfigDict(from_attributes=True)
+
+# ==== ANALYSIS REQUEST ====
+
+
+class PlantationAnalyzeRequest(BaseModel):
+    """
+    Input to trigger analysis.
+    Later this may include choices like:
+    - run_tree_model
+    - run_ndvi
+    - run_aqi
+    """
+    force_recompute: bool = False
